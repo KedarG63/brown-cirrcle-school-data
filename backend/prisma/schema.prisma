@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+}
+
+enum VisitStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REVIEWED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(EMPLOYEE)
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schoolsCreated School[]      @relation("SchoolCreatedBy")
+  visits         SchoolVisit[]
+
+  @@map("users")
+}
+
+model School {
+  id            String   @id @default(uuid())
+  name          String
+  location      String
+  address       String?
+  contactPerson String?
+  contactPhone  String?
+  district      String?
+  state         String?
+  pincode       String?
+  latitude      Float?
+  longitude     Float?
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  createdBy User          @relation("SchoolCreatedBy", fields: [createdById], references: [id])
+  visits    SchoolVisit[]
+
+  @@index([name])
+  @@index([location])
+  @@map("schools")
+}
+
+model SchoolVisit {
+  id         String      @id @default(uuid())
+  schoolId   String
+  employeeId String
+  visitDate  DateTime
+  status     VisitStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  school       School             @relation(fields: [schoolId], references: [id])
+  employee     User               @relation(fields: [employeeId], references: [id])
+  requirements SchoolRequirement?
+  images       VisitImage[]
+
+  @@index([employeeId])
+  @@index([visitDate])
+  @@map("school_visits")
+}
+
+model SchoolRequirement {
+  id      String @id @default(uuid())
+  visitId String @unique
+
+  // Core Requirements
+  booksNeeded           Boolean @default(false)
+  booksQuantity         Int?
+  uniformsNeeded        Boolean @default(false)
+  uniformsQuantity      Int?
+  furnitureNeeded       Boolean @default(false)
+  furnitureDetails      String?
+  paintingNeeded        Boolean @default(false)
+  paintingArea          String?
+  otherCoreRequirements String?
+
+  // Development Requirements
+  tvNeeded             Boolean @default(false)
+  tvQuantity           Int?
+  wifiNeeded           Boolean @default(false)
+  wifiDetails          String?
+  computersNeeded      Boolean @default(false)
+  computersQuantity    Int?
+  otherDevRequirements String?
+
+  // Additional
+  notes           String?
+  estimatedBudget Float?
+  priority        Priority @default(MEDIUM)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  visit SchoolVisit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  @@map("school_requirements")
+}
+
+model VisitImage {
+  id          String   @id @default(uuid())
+  visitId     String
+  imageUrl    String
+  imageKey    String
+  imageType   String?
+  description String?
+  uploadedAt  DateTime @default(now())
+
+  visit SchoolVisit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  @@index([visitId])
+  @@map("visit_images")
+}
