@@ -42,3 +42,10 @@ export function getPriorityColor(priority: string): string {
   };
   return colors[priority] || 'bg-gray-100 text-gray-700';
 }
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/api$/, '');
+
+export function getImageUrl(url: string): string {
+  if (url.startsWith('http')) return url;
+  return `${API_BASE}${url}`;
+}

@@ -42,5 +42,11 @@ service-account*.json
 # Test coverage
 coverage/
 
+# Uploaded files (local dev)
+backend/uploads/
+
+# Claude Code
+.claude/
+
 # Misc
 *.tsbuildinfo

@@ -7,7 +7,7 @@ import { visitsApi } from '@/lib/api/visits';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { formatDateTime, getStatusColor, getPriorityColor } from '@/lib/utils';
+import { formatDateTime, getStatusColor, getPriorityColor, getImageUrl } from '@/lib/utils';
 import { ArrowLeft, CheckCircle, XCircle, MapPin, User, Calendar } from 'lucide-react';
 
 function ReqItem({ label, needed, detail }: { label: string; needed: boolean; detail?: string | number | null }) {
@@ -111,7 +111,7 @@ export default function VisitDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {visit.images.map((img: any) => (
                 <div key={img.id} className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img src={img.imageUrl} alt={img.description || 'Visit photo'} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(img.imageUrl)} alt={img.description || 'Visit photo'} className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>

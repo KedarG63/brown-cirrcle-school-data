@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Camera, X } from 'lucide-react';
 import Link from 'next/link';
 
 const visitSchema = z.object({
@@ -56,6 +56,29 @@ function CheckboxField({ label, id, register, watch }: { label: string; id: stri
 export default function NewVisitPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    const total = selectedFiles.length + files.length;
+    if (total > 10) {
+      toast.error('Maximum 10 photos allowed');
+      return;
+    }
+    setSelectedFiles(prev => [...prev, ...files]);
+    const newPreviews = files.map(f => URL.createObjectURL(f));
+    setPreviews(prev => [...prev, ...newPreviews]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function removeFile(index: number) {
+    URL.revokeObjectURL(previews[index]);
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+  }
 
   const { data: schools, isLoading: schoolsLoading } = useQuery({
     queryKey: ['schools-all'],
@@ -74,11 +97,22 @@ export default function NewVisitPage() {
     setIsLoading(true);
     try {
       const { schoolId, visitDate, ...reqFields } = formData;
-      await visitsApi.create({
+      const res = await visitsApi.create({
         schoolId,
         visitDate,
         requirements: reqFields,
       });
+
+      if (selectedFiles.length > 0) {
+        const imageData = new FormData();
+        selectedFiles.forEach(file => imageData.append('images', file));
+        try {
+          await visitsApi.uploadImages(res.data.data!.id, imageData);
+        } catch {
+          toast.error('Visit saved but some photos failed to upload');
+        }
+      }
+
       toast.success('Visit recorded successfully');
       router.push('/dashboard/visits');
     } catch (error: any) {
@@ -156,6 +190,47 @@ export default function NewVisitPage() {
               {watch('computersNeeded') && <Input id="computersQuantity" type="number" placeholder="Quantity" className="ml-7 max-w-xs" {...register('computersQuantity')} />}
             </div>
             <Textarea id="otherDevRequirements" label="Other Development Needs" placeholder="Any other development requirements..." {...register('otherDevRequirements')} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Photos</CardTitle></CardHeader>
+          <CardContent>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleFilesSelected}
+            />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {previews.map((src, i) => (
+                <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                  <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(i)}
+                    className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+              {selectedFiles.length < 10 && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-primary-400 hover:text-primary-500 transition-colors"
+                >
+                  <Camera className="h-6 w-6" />
+                  <span className="text-xs font-medium">Add Photo</span>
+                </button>
+              )}
+            </div>
+            {selectedFiles.length > 0 && (
+              <p className="text-xs text-gray-400 mt-2">{selectedFiles.length}/10 photos selected</p>
+            )}
           </CardContent>
         </Card>
 

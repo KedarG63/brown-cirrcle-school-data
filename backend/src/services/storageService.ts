@@ -1,5 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
+import fs from 'fs';
 import { bucket } from '../config/cloudStorage';
+
+const UPLOADS_DIR = path.resolve(__dirname, '../../uploads');
 
 export const storageService = {
   async uploadToGCS(
@@ -7,8 +11,11 @@ export const storageService = {
     folder: string
   ): Promise<{ url: string; key: string }> {
     if (!bucket) {
-      // Fallback for development without GCS
+      // Fallback for development without GCS — save to local disk
       const key = `${folder}/${uuidv4()}-${file.originalname}`;
+      const filePath = path.join(UPLOADS_DIR, key);
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, file.buffer);
       return { url: `/uploads/${key}`, key };
     }
 
@@ -25,7 +32,12 @@ export const storageService = {
   },
 
   async deleteFromGCS(fileKey: string): Promise<void> {
-    if (!bucket) return;
+    if (!bucket) {
+      // Delete local file in development
+      const filePath = path.join(UPLOADS_DIR, fileKey);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      return;
+    }
     await bucket.file(fileKey).delete();
   },
 };

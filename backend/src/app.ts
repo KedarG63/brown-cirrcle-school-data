@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -14,11 +18,21 @@ import analyticsRoutes from './routes/analytics.routes';
 
 const app = express();
 
+// Serve uploaded files in development (before helmet so images load correctly)
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+
 // Security middleware
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(
   cors({
-    origin: env.frontendUrl,
+    origin: (origin, callback) => {
+      const allowedOrigins = [env.frontendUrl, 'http://localhost:3000', 'http://localhost:3001'];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
