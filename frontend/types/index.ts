@@ -22,6 +22,7 @@ export interface School {
   longitude?: number;
   createdById: string;
   createdBy?: { id: string; name: string };
+  visits?: SchoolVisit[];
   createdAt: string;
   updatedAt: string;
 }
