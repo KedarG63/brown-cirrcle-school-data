@@ -33,7 +33,7 @@ export interface SchoolVisit {
   employeeId: string;
   visitDate: string;
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REVIEWED';
-  school?: { id: string; name: string; location: string };
+  school?: { id: string; name: string; location: string; address?: string };
   employee?: { id: string; name: string };
   requirements?: SchoolRequirement;
   images?: VisitImage[];
