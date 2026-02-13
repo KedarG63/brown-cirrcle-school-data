@@ -112,6 +112,49 @@ export interface EmployeePerformance {
   lastVisitDate: string | null;
 }
 
+// Notes types
+export type NoteType = 'TEXT' | 'CHECKLIST';
+export type NoteColor = 'DEFAULT' | 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'TEAL' | 'BLUE' | 'PURPLE' | 'GRAY';
+
+export interface NoteChecklistItem {
+  id: string;
+  noteId: string;
+  text: string;
+  isCompleted: boolean;
+  position: number;
+  createdAt: string;
+}
+
+export interface NoteLabel {
+  id: string;
+  name: string;
+  color?: string;
+  createdById: string;
+  createdAt: string;
+}
+
+export interface Note {
+  id: string;
+  userId: string;
+  title?: string;
+  content?: string;
+  noteType: NoteType;
+  color: NoteColor;
+  isPinned: boolean;
+  isArchived: boolean;
+  isTrashed: boolean;
+  trashedAt?: string;
+  schoolId?: string;
+  visitId?: string;
+  createdAt: string;
+  updatedAt: string;
+  checklistItems?: NoteChecklistItem[];
+  labels?: { label: NoteLabel }[];
+  school?: { id: string; name: string };
+  visit?: { id: string; visitDate: string };
+  user?: { id: string; name: string };
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -121,4 +164,72 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
+}
+
+// Chat types
+export type MessageType = 'TEXT' | 'IMAGE' | 'FILE';
+
+export interface ChatUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'EMPLOYEE';
+}
+
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  senderId: string;
+  content: string | null;
+  messageType: MessageType;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  createdAt: string;
+  sender: { id: string; name: string };
+}
+
+export interface ChatListItem {
+  id: string;
+  isGroup: boolean;
+  name: string | null;
+  participants: ChatUser[] | null;
+  otherUser: ChatUser | null;
+  lastMessage: {
+    id: string;
+    content: string | null;
+    messageType: MessageType;
+    senderId: string;
+    senderName: string;
+    createdAt: string;
+  } | null;
+  unreadCount: number;
+  updatedAt: string;
+}
+
+export interface ChatDetail {
+  id: string;
+  isGroup?: boolean;
+  name?: string;
+  otherUser?: ChatUser;
+  participants?: (ChatUser & { participantRole: 'ADMIN' | 'MEMBER' })[];
+  isNew?: boolean;
+}
+
+export interface GroupDetail {
+  id: string;
+  name: string;
+  createdById: string;
+  participants: (ChatUser & {
+    participantRole: 'ADMIN' | 'MEMBER';
+    joinedAt: string;
+  })[];
+}
+
+export interface FileUploadResponse {
+  fileUrl: string;
+  fileKey: string;
+  fileName: string;
+  fileSize: number;
+  messageType: MessageType;
 }

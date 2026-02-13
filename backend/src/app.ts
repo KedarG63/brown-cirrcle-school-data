@@ -3,6 +3,7 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -10,11 +11,14 @@ import rateLimit from 'express-rate-limit';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
+import { initializeSocket } from './socket';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import schoolRoutes from './routes/school.routes';
 import visitRoutes from './routes/visit.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import noteRoutes from './routes/note.routes';
+import chatRoutes from './routes/chat.routes';
 
 const app = express();
 
@@ -67,13 +71,20 @@ app.use('/api/users', userRoutes);
 app.use('/api/schools', schoolRoutes);
 app.use('/api/visits', visitRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Error handler
 app.use(errorHandler);
 
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+initializeSocket(server);
+
 // Start server
-app.listen(env.port, () => {
+server.listen(env.port, () => {
   logger.info(`Server running on port ${env.port} in ${env.nodeEnv} mode`);
 });
 
+export { server };
 export default app;

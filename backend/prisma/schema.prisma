@@ -26,6 +26,39 @@ enum Priority {
   URGENT
 }
 
+enum NoteType {
+  TEXT
+  CHECKLIST
+}
+
+enum NoteColor {
+  DEFAULT
+  RED
+  ORANGE
+  YELLOW
+  GREEN
+  TEAL
+  BLUE
+  PURPLE
+  GRAY
+}
+
+enum ChatType {
+  ONE_ON_ONE
+  GROUP
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+}
+
+enum ParticipantRole {
+  ADMIN
+  MEMBER
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -37,8 +70,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  schoolsCreated School[]      @relation("SchoolCreatedBy")
-  visits         SchoolVisit[]
+  schoolsCreated   School[]          @relation("SchoolCreatedBy")
+  visits           SchoolVisit[]
+  notes            Note[]
+  labelsCreated    NoteLabel[]       @relation("NoteLabelCreatedBy")
+  chatsCreated     Chat[]            @relation("ChatCreatedBy")
+  chatParticipants ChatParticipant[]
+  messagesSent     Message[]
 
   @@map("users")
 }
@@ -61,6 +99,7 @@ model School {
 
   createdBy User          @relation("SchoolCreatedBy", fields: [createdById], references: [id])
   visits    SchoolVisit[]
+  notes     Note[]
 
   @@index([name])
   @@index([location])
@@ -80,6 +119,7 @@ model SchoolVisit {
   employee     User               @relation(fields: [employeeId], references: [id])
   requirements SchoolRequirement?
   images       VisitImage[]
+  notes        Note[]
 
   @@index([employeeId])
   @@index([visitDate])
@@ -135,4 +175,133 @@ model VisitImage {
 
   @@index([visitId])
   @@map("visit_images")
+}
+
+model Note {
+  id         String    @id @default(uuid())
+  userId     String
+  title      String?
+  content    String?   @db.Text
+  noteType   NoteType  @default(TEXT)
+  color      NoteColor @default(DEFAULT)
+  isPinned   Boolean   @default(false)
+  isArchived Boolean   @default(false)
+  isTrashed  Boolean   @default(false)
+  trashedAt  DateTime?
+  schoolId   String?
+  visitId    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school         School?             @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  visit          SchoolVisit?        @relation(fields: [visitId], references: [id], onDelete: SetNull)
+  checklistItems NoteChecklistItem[]
+  labels         NoteNoteLabel[]
+
+  @@index([userId])
+  @@index([schoolId])
+  @@index([visitId])
+  @@index([isPinned])
+  @@index([isArchived])
+  @@index([isTrashed])
+  @@index([createdAt])
+  @@map("notes")
+}
+
+model NoteChecklistItem {
+  id          String   @id @default(uuid())
+  noteId      String
+  text        String
+  isCompleted Boolean  @default(false)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+  @@map("note_checklist_items")
+}
+
+model NoteLabel {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  color       String?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  createdBy User            @relation("NoteLabelCreatedBy", fields: [createdById], references: [id])
+  notes     NoteNoteLabel[]
+
+  @@index([name])
+  @@map("note_labels")
+}
+
+model NoteNoteLabel {
+  id        String   @id @default(uuid())
+  noteId    String
+  labelId   String
+  createdAt DateTime @default(now())
+
+  note  Note      @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  label NoteLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, labelId])
+  @@index([noteId])
+  @@index([labelId])
+  @@map("note_note_labels")
+}
+
+model Chat {
+  id          String   @id @default(uuid())
+  type        ChatType @default(ONE_ON_ONE)
+  name        String?
+  isGroup     Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy    User?            @relation("ChatCreatedBy", fields: [createdById], references: [id])
+  participants ChatParticipant[]
+  messages     Message[]
+
+  @@index([isGroup])
+  @@map("chats")
+}
+
+model ChatParticipant {
+  id          String          @id @default(uuid())
+  chatId      String
+  userId      String
+  role        ParticipantRole @default(MEMBER)
+  unreadCount Int             @default(0)
+  joinedAt    DateTime        @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
+  @@map("chat_participants")
+}
+
+model Message {
+  id          String      @id @default(uuid())
+  chatId      String
+  senderId    String
+  content     String?     @db.Text
+  messageType MessageType @default(TEXT)
+  fileUrl     String?
+  fileName    String?
+  fileSize    Int?
+  createdAt   DateTime    @default(now())
+
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("messages")
 }

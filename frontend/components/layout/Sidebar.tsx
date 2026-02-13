@@ -11,18 +11,24 @@ import {
   Users,
   BarChart3,
   BookOpen,
+  StickyNote,
+  MessageSquare,
 } from 'lucide-react';
 
 const employeeNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Schools', href: '/dashboard/schools', icon: School },
   { name: 'Visits', href: '/dashboard/visits', icon: ClipboardList },
+  { name: 'Notes', href: '/dashboard/notes', icon: StickyNote },
+  { name: 'Chat', href: '/dashboard/chat', icon: MessageSquare },
 ];
 
 const adminNav = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Schools', href: '/dashboard/schools', icon: School },
   { name: 'Visits', href: '/dashboard/visits', icon: ClipboardList },
+  { name: 'Notes', href: '/dashboard/notes', icon: StickyNote },
+  { name: 'Chat', href: '/dashboard/chat', icon: MessageSquare },
   { name: 'Employees', href: '/dashboard/admin/employees', icon: Users },
   { name: 'Analytics', href: '/dashboard/admin/analytics', icon: BarChart3 },
 ];
