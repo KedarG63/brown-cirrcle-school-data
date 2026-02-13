@@ -16,7 +16,7 @@ export const schoolController = {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const school = await schoolService.getById(req.params.id);
+      const school = await schoolService.getById(req.params.id as string);
       res.json({ success: true, data: school });
     } catch (error) {
       next(error);
@@ -37,7 +37,7 @@ export const schoolController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const school = await schoolService.update(req.params.id, req.body);
+      const school = await schoolService.update(req.params.id as string, req.body);
       res.json({ success: true, data: school, message: 'School updated successfully' });
     } catch (error) {
       next(error);
@@ -46,7 +46,7 @@ export const schoolController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await schoolService.delete(req.params.id);
+      await schoolService.delete(req.params.id as string);
       res.json({ success: true, message: 'School deleted successfully' });
     } catch (error) {
       next(error);

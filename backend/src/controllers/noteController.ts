@@ -29,7 +29,7 @@ export const noteController = {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.getById(req.params.id, req.user!.userId);
+      const note = await noteService.getById(req.params.id as string, req.user!.userId);
       res.json({ success: true, data: note });
     } catch (error) {
       next(error);
@@ -50,7 +50,7 @@ export const noteController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.update(req.params.id, req.user!.userId, req.body);
+      const note = await noteService.update(req.params.id as string, req.user!.userId, req.body);
       res.json({ success: true, data: note, message: 'Note updated successfully' });
     } catch (error) {
       next(error);
@@ -59,7 +59,7 @@ export const noteController = {
 
   async togglePin(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.togglePin(req.params.id, req.user!.userId);
+      const note = await noteService.togglePin(req.params.id as string, req.user!.userId);
       res.json({ success: true, data: note });
     } catch (error) {
       next(error);
@@ -68,7 +68,7 @@ export const noteController = {
 
   async toggleArchive(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.toggleArchive(req.params.id, req.user!.userId);
+      const note = await noteService.toggleArchive(req.params.id as string, req.user!.userId);
       res.json({ success: true, data: note });
     } catch (error) {
       next(error);
@@ -77,7 +77,7 @@ export const noteController = {
 
   async moveToTrash(req: Request, res: Response, next: NextFunction) {
     try {
-      await noteService.moveToTrash(req.params.id, req.user!.userId);
+      await noteService.moveToTrash(req.params.id as string, req.user!.userId);
       res.json({ success: true, message: 'Note moved to trash' });
     } catch (error) {
       next(error);
@@ -86,7 +86,7 @@ export const noteController = {
 
   async restoreFromTrash(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.restoreFromTrash(req.params.id, req.user!.userId);
+      const note = await noteService.restoreFromTrash(req.params.id as string, req.user!.userId);
       res.json({ success: true, data: note, message: 'Note restored' });
     } catch (error) {
       next(error);
@@ -95,7 +95,7 @@ export const noteController = {
 
   async permanentDelete(req: Request, res: Response, next: NextFunction) {
     try {
-      await noteService.permanentDelete(req.params.id, req.user!.userId);
+      await noteService.permanentDelete(req.params.id as string, req.user!.userId);
       res.json({ success: true, message: 'Note permanently deleted' });
     } catch (error) {
       next(error);
@@ -104,7 +104,7 @@ export const noteController = {
 
   async updateColor(req: Request, res: Response, next: NextFunction) {
     try {
-      const note = await noteService.updateColor(req.params.id, req.user!.userId, req.body.color);
+      const note = await noteService.updateColor(req.params.id as string, req.user!.userId, req.body.color);
       res.json({ success: true, data: note });
     } catch (error) {
       next(error);
@@ -114,7 +114,7 @@ export const noteController = {
   // Checklist items
   async addChecklistItem(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await noteService.addChecklistItem(req.params.id, req.user!.userId, req.body);
+      const item = await noteService.addChecklistItem(req.params.id as string, req.user!.userId, req.body);
       res.status(201).json({ success: true, data: item });
     } catch (error) {
       next(error);
@@ -124,8 +124,8 @@ export const noteController = {
   async updateChecklistItem(req: Request, res: Response, next: NextFunction) {
     try {
       const item = await noteService.updateChecklistItem(
-        req.params.id,
-        req.params.itemId,
+        req.params.id as string,
+        req.params.itemId as string,
         req.user!.userId,
         req.body
       );
@@ -137,7 +137,7 @@ export const noteController = {
 
   async deleteChecklistItem(req: Request, res: Response, next: NextFunction) {
     try {
-      await noteService.deleteChecklistItem(req.params.id, req.params.itemId, req.user!.userId);
+      await noteService.deleteChecklistItem(req.params.id as string, req.params.itemId as string, req.user!.userId);
       res.json({ success: true, message: 'Checklist item deleted' });
     } catch (error) {
       next(error);
@@ -165,7 +165,7 @@ export const noteController = {
 
   async updateLabel(req: Request, res: Response, next: NextFunction) {
     try {
-      const label = await noteService.updateLabel(req.params.id, req.user!.userId, req.body);
+      const label = await noteService.updateLabel(req.params.id as string, req.user!.userId, req.body);
       res.json({ success: true, data: label });
     } catch (error) {
       next(error);
@@ -174,7 +174,7 @@ export const noteController = {
 
   async deleteLabel(req: Request, res: Response, next: NextFunction) {
     try {
-      await noteService.deleteLabel(req.params.id, req.user!.userId);
+      await noteService.deleteLabel(req.params.id as string, req.user!.userId);
       res.json({ success: true, message: 'Label deleted' });
     } catch (error) {
       next(error);
@@ -184,8 +184,8 @@ export const noteController = {
   async addLabelToNote(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await noteService.addLabelToNote(
-        req.params.noteId,
-        req.params.labelId,
+        req.params.noteId as string,
+        req.params.labelId as string,
         req.user!.userId
       );
       res.json({ success: true, data: result });
@@ -197,8 +197,8 @@ export const noteController = {
   async removeLabelFromNote(req: Request, res: Response, next: NextFunction) {
     try {
       await noteService.removeLabelFromNote(
-        req.params.noteId,
-        req.params.labelId,
+        req.params.noteId as string,
+        req.params.labelId as string,
         req.user!.userId
       );
       res.json({ success: true, message: 'Label removed from note' });

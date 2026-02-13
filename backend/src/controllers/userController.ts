@@ -16,7 +16,7 @@ export const userController = {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await userService.getById(req.params.id);
+      const user = await userService.getById(req.params.id as string);
       res.json({ success: true, data: user });
     } catch (error) {
       next(error);
@@ -25,7 +25,7 @@ export const userController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await userService.update(req.params.id, req.body);
+      const user = await userService.update(req.params.id as string, req.body);
       res.json({ success: true, data: user, message: 'User updated successfully' });
     } catch (error) {
       next(error);
@@ -34,7 +34,7 @@ export const userController = {
 
   async toggleActive(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await userService.toggleActive(req.params.id);
+      const user = await userService.toggleActive(req.params.id as string);
       res.json({ success: true, data: user, message: `User ${user.isActive ? 'activated' : 'deactivated'}` });
     } catch (error) {
       next(error);
@@ -43,7 +43,7 @@ export const userController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await userService.delete(req.params.id);
+      await userService.delete(req.params.id as string);
       res.json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
       next(error);

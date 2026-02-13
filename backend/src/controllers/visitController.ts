@@ -29,7 +29,7 @@ export const visitController = {
 
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const visit = await visitService.getById(req.params.id);
+      const visit = await visitService.getById(req.params.id as string);
       res.json({ success: true, data: visit });
     } catch (error) {
       next(error);
@@ -50,7 +50,7 @@ export const visitController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const visit = await visitService.update(req.params.id, req.body);
+      const visit = await visitService.update(req.params.id as string, req.body);
       res.json({ success: true, data: visit, message: 'Visit updated successfully' });
     } catch (error) {
       next(error);
@@ -59,7 +59,7 @@ export const visitController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await visitService.delete(req.params.id);
+      await visitService.delete(req.params.id as string);
       res.json({ success: true, message: 'Visit deleted successfully' });
     } catch (error) {
       next(error);
@@ -87,7 +87,7 @@ export const visitController = {
         imageType: req.body.imageTypes?.[index] || 'general',
       }));
 
-      const result = await visitService.addImages(id, images);
+      const result = await visitService.addImages(id as string, images);
       res.json({ success: true, data: { count: result.count }, message: 'Images uploaded successfully' });
     } catch (error) {
       next(error);
@@ -96,7 +96,7 @@ export const visitController = {
 
   async deleteImage(req: Request, res: Response, next: NextFunction) {
     try {
-      const image = await visitService.deleteImage(req.params.imageId);
+      const image = await visitService.deleteImage(req.params.imageId as string);
       await storageService.deleteFromGCS(image.imageKey);
       res.json({ success: true, message: 'Image deleted successfully' });
     } catch (error) {
