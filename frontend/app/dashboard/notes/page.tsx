@@ -137,10 +137,10 @@ export default function NotesPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Notes</h2>
-          <p className="text-gray-500">Quick notes, checklists & ideas</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Notes</h2>
+          <p className="text-sm text-gray-500">Quick notes, checklists & ideas</p>
         </div>
         <Button
           onClick={() => {
@@ -154,7 +154,7 @@ export default function NotesPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-6 border-b border-gray-200">
+      <div className="flex items-center gap-4 sm:gap-6 border-b border-gray-200 overflow-x-auto scrollbar-hide">
         {([
           { key: 'notes', label: 'Notes', icon: StickyNote },
           { key: 'archive', label: 'Archive', icon: Archive },
@@ -180,9 +180,9 @@ export default function NotesPage() {
       </div>
 
       {/* Search & Filters bar */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+        <div className="relative w-full sm:flex-1 sm:min-w-[200px] sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"

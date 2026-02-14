@@ -148,11 +148,11 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div
         className={cn(
-          'relative z-50 w-full max-w-2xl rounded-xl shadow-xl flex flex-col max-h-[85vh]',
+          'relative z-50 w-full max-w-2xl rounded-t-xl sm:rounded-xl shadow-xl flex flex-col max-h-[90vh] sm:max-h-[85vh] sm:mx-4',
           noteColorClasses[color]
         )}
       >

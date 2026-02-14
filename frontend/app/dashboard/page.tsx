@@ -14,14 +14,14 @@ import Link from 'next/link';
 function StatCard({ title, value, icon: Icon, color }: { title: string; value: number | string; icon: any; color: string }) {
   return (
     <Card>
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-500">{title}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{value}</p>
           </div>
-          <div className={`h-12 w-12 rounded-xl ${color} flex items-center justify-center`}>
-            <Icon className="h-6 w-6 text-white" />
+          <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           </div>
         </div>
       </CardContent>
@@ -51,11 +51,11 @@ function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-        <p className="text-gray-500">Overview of school assessment activities</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h2>
+        <p className="text-sm text-gray-500">Overview of school assessment activities</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Total Schools" value={stats?.totalSchools || 0} icon={School} color="bg-blue-500" />
         <StatCard title="Total Visits" value={stats?.totalVisits || 0} icon={ClipboardList} color="bg-green-500" />
         <StatCard title="Active Employees" value={stats?.activeEmployees || 0} icon={Users} color="bg-purple-500" />
@@ -141,12 +141,12 @@ function EmployeeDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Dashboard</h2>
-          <p className="text-gray-500">Your recent activity and quick actions</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">My Dashboard</h2>
+          <p className="text-sm text-gray-500">Your recent activity and quick actions</p>
         </div>
-        <Link href="/dashboard/visits/new" className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+        <Link href="/dashboard/visits/new" className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-3 sm:px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 whitespace-nowrap">
           + New Visit
         </Link>
       </div>
@@ -188,12 +188,12 @@ function EmployeeDashboard() {
         <CardContent>
           <div className="space-y-3">
             {visitsData?.items?.map((visit: any) => (
-              <Link key={visit.id} href={`/dashboard/visits/${visit.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
-                <div>
-                  <p className="font-medium">{visit.school?.name}</p>
-                  <p className="text-sm text-gray-500">{visit.school?.location} &middot; {formatDate(visit.visitDate)}</p>
+              <Link key={visit.id} href={`/dashboard/visits/${visit.id}`} className="flex items-center justify-between gap-2 p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium truncate">{visit.school?.name}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 truncate">{visit.school?.location} &middot; {formatDate(visit.visitDate)}</p>
                 </div>
-                <Badge className={getStatusColor(visit.status)}>{visit.status}</Badge>
+                <Badge className={`flex-shrink-0 ${getStatusColor(visit.status)}`}>{visit.status}</Badge>
               </Link>
             ))}
             {(!visitsData?.items || visitsData.items.length === 0) && (

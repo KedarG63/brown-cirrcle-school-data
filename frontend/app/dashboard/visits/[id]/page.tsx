@@ -41,20 +41,20 @@ export default function VisitDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard/visits" className="p-2 rounded-lg hover:bg-gray-100">
+      <div className="flex items-start gap-3">
+        <Link href="/dashboard/visits" className="p-2 rounded-lg hover:bg-gray-100 flex-shrink-0 mt-0.5">
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-900">{visit.school?.name || 'Visit'}</h2>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{visit.school?.name || 'Visit'}</h2>
             <Badge className={getStatusColor(visit.status)}>{visit.status}</Badge>
             {req?.priority && <Badge className={getPriorityColor(req.priority)}>{req.priority}</Badge>}
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-            {visit.school && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{visit.school.location || visit.school.address}</span>}
-            <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" />{visit.employee?.name}</span>
-            <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{formatDateTime(visit.visitDate)}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500 mt-1">
+            {visit.school && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 flex-shrink-0" />{visit.school.location || visit.school.address}</span>}
+            <span className="flex items-center gap-1"><User className="h-3.5 w-3.5 flex-shrink-0" />{visit.employee?.name}</span>
+            <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5 flex-shrink-0" />{formatDateTime(visit.visitDate)}</span>
           </div>
         </div>
       </div>

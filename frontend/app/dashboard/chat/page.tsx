@@ -55,10 +55,14 @@ export default function ChatPage() {
     setSelectedChatId(chatId);
   };
 
+  const handleBackToList = () => {
+    setSelectedChatId(null);
+  };
+
   return (
     <div className="flex h-[calc(100vh-7rem)] bg-white rounded-xl border border-gray-200 overflow-hidden">
-      {/* Left panel: Chat list */}
-      <div className="w-80 border-r border-gray-200 flex flex-col">
+      {/* Left panel: Chat list - hidden on mobile when a chat is selected */}
+      <div className={`w-full md:w-80 border-r border-gray-200 flex-col ${selectedChatId ? 'hidden md:flex' : 'flex'}`}>
         <ChatList
           chats={chats}
           isLoading={isLoading}
@@ -69,12 +73,13 @@ export default function ChatPage() {
         />
       </div>
 
-      {/* Right panel: Conversation */}
-      <div className="flex-1 flex flex-col">
+      {/* Right panel: Conversation - full width on mobile */}
+      <div className={`flex-1 flex-col ${selectedChatId ? 'flex' : 'hidden md:flex'}`}>
         {selectedChatId ? (
           <ChatConversation
             chatId={selectedChatId}
             currentUserId={user?.id || ''}
+            onBack={handleBackToList}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-400">

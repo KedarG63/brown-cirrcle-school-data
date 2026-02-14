@@ -9,14 +9,15 @@ import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { GroupInfoPanel } from './GroupInfoPanel';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
-import { Users } from 'lucide-react';
+import { Users, ArrowLeft } from 'lucide-react';
 
 interface ChatConversationProps {
   chatId: string;
   currentUserId: string;
+  onBack?: () => void;
 }
 
-export function ChatConversation({ chatId, currentUserId }: ChatConversationProps) {
+export function ChatConversation({ chatId, currentUserId, onBack }: ChatConversationProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const { sendMessage, joinChat, onNewMessage } = useSocket();
@@ -90,8 +91,16 @@ export function ChatConversation({ chatId, currentUserId }: ChatConversationProp
   return (
     <>
       {/* Chat header */}
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center gap-3 bg-white">
-        <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center">
+      <div className="px-3 sm:px-4 py-3 border-b border-gray-200 flex items-center gap-2 sm:gap-3 bg-white">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="p-1.5 rounded-lg hover:bg-gray-100 md:hidden"
+          >
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+        )}
+        <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
           {isGroup ? (
             <Users className="w-4 h-4 text-primary-700" />
           ) : (

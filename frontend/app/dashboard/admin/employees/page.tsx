@@ -149,10 +149,10 @@ export default function EmployeesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Employees</h2>
-          <p className="text-gray-500">Manage system users</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Employees</h2>
+          <p className="text-sm text-gray-500">Manage system users</p>
         </div>
         <Button onClick={() => { setFormData(emptyForm); setFormErrors({}); setShowAddModal(true); }}>
           <Plus className="h-4 w-4 mr-2" />
@@ -160,7 +160,7 @@ export default function EmployeesPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative w-full sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Search by name or email..."
@@ -170,7 +170,8 @@ export default function EmployeesPage() {
         />
       </div>
 
-      <Card>
+      {/* Desktop table */}
+      <Card className="hidden md:block">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -223,6 +224,44 @@ export default function EmployeesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden">
+        {data?.items?.length === 0 && (
+          <div className="py-8 text-center text-gray-400">No employees found</div>
+        )}
+        {data?.items?.map((user: User) => (
+          <Card key={user.id}>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-gray-900 truncate">{user.name}</p>
+                  <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                  {user.phone && <p className="text-sm text-gray-500">{user.phone}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant={user.role === 'ADMIN' ? 'info' : 'default'}>{user.role}</Badge>
+                  <Badge variant={user.isActive ? 'success' : 'error'}>{user.isActive ? 'Active' : 'Inactive'}</Badge>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                <span className="text-xs text-gray-400">Joined {formatDate(user.createdAt)}</span>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => openEditModal(user)} title="Edit">
+                    <Pencil className="h-4 w-4 text-gray-500" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => toggleMutation.mutate(user.id)} title={user.isActive ? 'Deactivate' : 'Activate'}>
+                    {user.isActive ? <UserX className="h-4 w-4 text-red-500" /> : <UserCheck className="h-4 w-4 text-green-500" />}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDeletingUser(user)} title="Delete">
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Add Employee Modal */}
       <Modal isOpen={showAddModal} onClose={closeAddModal} title="Add Employee">

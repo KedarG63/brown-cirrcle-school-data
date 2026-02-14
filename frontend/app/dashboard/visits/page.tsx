@@ -27,22 +27,23 @@ export default function VisitsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Visits</h2>
-          <p className="text-gray-500">School visit records</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Visits</h2>
+          <p className="text-sm text-gray-500">School visit records</p>
         </div>
         <Link href="/dashboard/visits/new">
-          <Button><Plus className="h-4 w-4 mr-2" />New Visit</Button>
+          <Button size="sm" className="sm:hidden"><Plus className="h-4 w-4" /></Button>
+          <Button className="hidden sm:inline-flex"><Plus className="h-4 w-4 mr-2" />New Visit</Button>
         </Link>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
         {['', 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'REVIEWED'].map((s) => (
           <button
             key={s}
             onClick={() => { setStatus(s); setPage(1); }}
-            className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+            className={`px-3 py-1.5 text-sm rounded-full transition-colors whitespace-nowrap flex-shrink-0 ${
               status === s
                 ? 'bg-primary-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -61,24 +62,26 @@ export default function VisitsPage() {
             {data?.items?.map((visit: any) => (
               <Link key={visit.id} href={`/dashboard/visits/${visit.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-semibold">{visit.school?.name}</h3>
-                        <Badge className={getStatusColor(visit.status)}>{visit.status}</Badge>
-                        {visit.requirements?.priority && (
-                          <Badge className={getPriorityColor(visit.requirements.priority)}>{visit.requirements.priority}</Badge>
-                        )}
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold truncate">{visit.school?.name}</h3>
+                          <Badge className={getStatusColor(visit.status)}>{visit.status}</Badge>
+                          {visit.requirements?.priority && (
+                            <Badge className={getPriorityColor(visit.requirements.priority)}>{visit.requirements.priority}</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">
+                          {visit.school?.location} &middot; {visit.employee?.name} &middot; {formatDate(visit.visitDate)}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {visit.school?.location} &middot; {visit.employee?.name} &middot; {formatDate(visit.visitDate)}
-                      </p>
+                      {visit._count?.images > 0 && (
+                        <div className="flex items-center gap-1 text-sm text-gray-400 flex-shrink-0">
+                          <Image className="h-4 w-4" />{visit._count.images}
+                        </div>
+                      )}
                     </div>
-                    {visit._count?.images > 0 && (
-                      <div className="flex items-center gap-1 text-sm text-gray-400">
-                        <Image className="h-4 w-4" />{visit._count.images}
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               </Link>

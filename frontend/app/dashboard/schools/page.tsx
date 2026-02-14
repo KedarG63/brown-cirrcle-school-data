@@ -25,17 +25,18 @@ export default function SchoolsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Schools</h2>
-          <p className="text-gray-500">Manage registered schools</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Schools</h2>
+          <p className="text-sm text-gray-500">Manage registered schools</p>
         </div>
         <Link href="/dashboard/schools/new">
-          <Button><Plus className="h-4 w-4 mr-2" />Add School</Button>
+          <Button size="sm" className="sm:hidden"><Plus className="h-4 w-4" /></Button>
+          <Button className="hidden sm:inline-flex"><Plus className="h-4 w-4 mr-2" />Add School</Button>
         </Link>
       </div>
 
-      <div className="relative max-w-md">
+      <div className="relative w-full sm:max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
           type="text"
