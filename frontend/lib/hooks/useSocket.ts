@@ -24,6 +24,7 @@ export function useSocket() {
 
     socket = io(SOCKET_URL, {
       auth: { token },
+      path: '/api/socket.io',
       transports: ['websocket', 'polling'],
     });
 

@@ -191,7 +191,7 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 min-h-0">
           <input
             type="text"
             value={title}
@@ -205,7 +205,7 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Take a note..."
-              className="w-full min-h-[180px] border-none outline-none resize-none bg-transparent text-sm text-gray-700 placeholder:text-gray-400"
+              className="w-full min-h-[120px] sm:min-h-[180px] border-none outline-none resize-none bg-transparent text-sm text-gray-700 placeholder:text-gray-400"
             />
           )}
 
@@ -250,7 +250,7 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-200/50">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-t border-gray-200/50 flex-shrink-0">
           <div className="flex items-center gap-3">
             <ColorPicker selected={color} onChange={setColor} />
             <button

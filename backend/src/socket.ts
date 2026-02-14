@@ -14,6 +14,7 @@ export function getIO(): Server {
 
 export function initializeSocket(server: HttpServer): void {
   io = new Server(server, {
+    path: '/api/socket.io',
     cors: {
       origin: [env.frontendUrl, 'http://localhost:3000', 'http://localhost:3001'],
       methods: ['GET', 'POST'],
