@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Note, NoteType, NoteColor, NoteLabel } from '@/types';
 import { ColorPicker, noteColorClasses } from './ColorPicker';
-import { ChecklistEditor } from './ChecklistEditor';
+import { ChecklistEditor, ChecklistEditorRef } from './ChecklistEditor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { X, Type, CheckSquare, Tag, Pin } from 'lucide-react';
@@ -32,11 +32,23 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
   const [showLabels, setShowLabels] = useState(false);
   const [newLabelName, setNewLabelName] = useState('');
   const [saving, setSaving] = useState(false);
+  const checklistRef = useRef<ChecklistEditorRef>(null);
 
   const isEditing = !!note?.id;
 
   const handleSave = async () => {
-    if (!title?.trim() && !content?.trim() && checklistItems.length === 0) {
+    // Flush any pending checklist item text before saving
+    let finalChecklistItems = checklistItems;
+    if (noteType === 'CHECKLIST' && checklistRef.current) {
+      const pendingText = checklistRef.current.getPendingText();
+      if (pendingText.trim()) {
+        finalChecklistItems = [...checklistItems, { text: pendingText.trim(), isCompleted: false }];
+        setChecklistItems(finalChecklistItems);
+        checklistRef.current.clearPendingText();
+      }
+    }
+
+    if (!title?.trim() && !content?.trim() && finalChecklistItems.length === 0) {
       toast.error('Note cannot be empty');
       return;
     }
@@ -54,9 +66,8 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
         // Sync checklist items for existing notes
         if (noteType === 'CHECKLIST' && note?.id) {
           // Delete removed items
-          const existingIds = note.checklistItems?.map((i) => i.id) || [];
           for (const existingItem of note.checklistItems || []) {
-            const stillExists = checklistItems.some(
+            const stillExists = finalChecklistItems.some(
               (i) => i.text === existingItem.text
             );
             if (!stillExists) {
@@ -64,19 +75,19 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
             }
           }
           // Update existing & add new items
-          for (let i = 0; i < checklistItems.length; i++) {
+          for (let i = 0; i < finalChecklistItems.length; i++) {
             const existingItem = note.checklistItems?.find(
-              (ei) => ei.text === checklistItems[i].text
+              (ei) => ei.text === finalChecklistItems[i].text
             );
             if (existingItem) {
               await notesApi.updateChecklistItem(note.id, existingItem.id, {
-                text: checklistItems[i].text,
-                isCompleted: checklistItems[i].isCompleted,
+                text: finalChecklistItems[i].text,
+                isCompleted: finalChecklistItems[i].isCompleted,
                 position: i,
               });
             } else {
               await notesApi.addChecklistItem(note.id, {
-                text: checklistItems[i].text,
+                text: finalChecklistItems[i].text,
                 position: i,
               });
             }
@@ -101,7 +112,7 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
           content: noteType === 'TEXT' ? (content || undefined) : undefined,
           noteType,
           color,
-          checklistItems: noteType === 'CHECKLIST' ? checklistItems.map((item, i) => ({
+          checklistItems: noteType === 'CHECKLIST' ? finalChecklistItems.map((item, i) => ({
             text: item.text,
             isCompleted: item.isCompleted,
             position: i,
@@ -210,7 +221,7 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
           )}
 
           {noteType === 'CHECKLIST' && (
-            <ChecklistEditor items={checklistItems} onChange={setChecklistItems} />
+            <ChecklistEditor ref={checklistRef} items={checklistItems} onChange={setChecklistItems} />
           )}
         </div>
 
@@ -250,22 +261,24 @@ export function NoteEditor({ note, onSave, onClose, labels, onLabelsChange }: No
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-3 sm:p-4 border-t border-gray-200/50 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <ColorPicker selected={color} onChange={setColor} />
-            <button
-              onClick={() => setShowLabels(!showLabels)}
-              className={cn(
-                'p-1.5 rounded-lg transition-colors',
-                showLabels ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-200/70 text-gray-500'
-              )}
-              title="Labels"
-            >
-              <Tag className="w-4 h-4" />
-            </button>
+        <div className="flex flex-col gap-3 p-3 sm:p-4 border-t border-gray-200/50 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ColorPicker selected={color} onChange={setColor} />
+              <button
+                onClick={() => setShowLabels(!showLabels)}
+                className={cn(
+                  'p-1.5 rounded-lg transition-colors',
+                  showLabels ? 'bg-primary-100 text-primary-700' : 'hover:bg-gray-200/70 text-gray-500'
+                )}
+                title="Labels"
+              >
+                <Tag className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-end">
             <Button variant="ghost" size="sm" onClick={onClose}>
               Cancel
             </Button>
