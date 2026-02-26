@@ -22,6 +22,9 @@ import chatRoutes from './routes/chat.routes';
 
 const app = express();
 
+// Trust Nginx reverse proxy (required for express-rate-limit and correct IP detection)
+app.set('trust proxy', 1);
+
 // Serve uploaded files in development (before helmet so images load correctly)
 app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 

@@ -24,7 +24,8 @@ export const storageService = {
 
     await fileUpload.save(file.buffer, {
       metadata: { contentType: file.mimetype },
-      public: true,
+      // public: true removed — bucket uses Uniform Bucket-Level Access (UBA),
+      // per-object ACLs are disabled. Public access is controlled via bucket IAM.
     });
 
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
