@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Send, Paperclip, X, FileText, Loader2 } from 'lucide-react';
+import { Send, Paperclip, X, FileText, Loader2, Video } from 'lucide-react';
 import { chatsApi } from '@/lib/api/chats';
 import { MessageType } from '@/types';
 import { toast } from 'sonner';
@@ -26,6 +26,7 @@ export function MessageInput({ chatId, onSend }: MessageInputProps) {
     fileSize: number;
     messageType: MessageType;
     previewUrl?: string;
+    isVideo?: boolean;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,27 +59,43 @@ export function MessageInput({ chatId, onSend }: MessageInputProps) {
     }
   };
 
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (fileInputRef.current) fileInputRef.current.value = '';
 
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('File too large. Maximum size is 100MB.');
+      return;
+    }
+
     setUploading(true);
     try {
       const { data } = await chatsApi.uploadFile(chatId, file);
       if (data.data) {
         const isImage = file.type.startsWith('image/');
+        const isVideo = file.type.startsWith('video/');
         setPendingFile({
           fileUrl: data.data.fileUrl,
           fileName: data.data.fileName,
           fileSize: data.data.fileSize,
           messageType: data.data.messageType,
           previewUrl: isImage ? URL.createObjectURL(file) : undefined,
+          isVideo,
         });
       }
-    } catch {
-      toast.error('Failed to upload file');
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      if (msg?.includes('File type not allowed')) {
+        toast.error('File type not supported. Allowed: images, videos, PDF, DOCX, XLSX.');
+      } else if (err?.response?.status === 413 || msg?.includes('too large') || msg?.includes('File too large')) {
+        toast.error('File too large. Maximum size is 100MB.');
+      } else {
+        toast.error('Failed to upload file. Please try again.');
+      }
     } finally {
       setUploading(false);
     }
@@ -105,6 +122,10 @@ export function MessageInput({ chatId, onSend }: MessageInputProps) {
               <>
                 {pendingFile.previewUrl ? (
                   <img src={pendingFile.previewUrl} alt="" className="w-10 h-10 rounded object-cover" />
+                ) : pendingFile.isVideo ? (
+                  <div className="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">
+                    <Video className="w-5 h-5 text-gray-500" />
+                  </div>
                 ) : (
                   <div className="w-10 h-10 rounded bg-gray-200 flex items-center justify-center">
                     <FileText className="w-5 h-5 text-gray-500" />
@@ -133,7 +154,7 @@ export function MessageInput({ chatId, onSend }: MessageInputProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,.pdf,.doc,.docx,.xls,.xlsx"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/x-msvideo,video/webm,video/3gpp,.pdf,.doc,.docx,.xls,.xlsx"
             onChange={handleFileSelect}
             className="hidden"
           />

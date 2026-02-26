@@ -24,11 +24,19 @@ export const upload = multer({
 
 export const uploadMultiple = upload.array('images', 10);
 
-// Chat file upload — images + documents
+// Chat file upload — images, videos + documents
 const chatAllowedMimeTypes = [
   'image/jpeg',
   'image/png',
   'image/webp',
+  'image/heic',
+  'image/heif',
+  'video/mp4',
+  'video/quicktime',
+  'video/x-msvideo',
+  'video/webm',
+  'video/3gpp',
+  'video/3gpp2',
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -44,7 +52,7 @@ const chatFileFilter = (
   if (chatAllowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('File type not allowed. Allowed: JPEG, PNG, WebP, PDF, DOCX, XLSX'));
+    cb(new Error('File type not allowed. Allowed: JPEG, PNG, WebP, HEIC, MP4, MOV, AVI, WebM, PDF, DOCX, XLSX'));
   }
 };
 
@@ -52,7 +60,7 @@ const chatUpload = multer({
   storage,
   fileFilter: chatFileFilter,
   limits: {
-    fileSize: 25 * 1024 * 1024, // 25MB
+    fileSize: 100 * 1024 * 1024, // 100MB (videos can be large)
   },
 });
 
